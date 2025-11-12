@@ -1,0 +1,27 @@
+name: Validate IaC Projects
+
+on:
+  push:
+    branches:
+      - 'project/**'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract project name
+        id: project
+        run: echo "name=${GITHUB_REF#refs/heads/project/}" >> $GITHUB_OUTPUT
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Validate IaC
+        run: make ci-validate PROJECT=${{ steps.project.outputs.name }}
