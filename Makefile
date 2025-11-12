@@ -1,10 +1,18 @@
-.PHONY: help init-project sync-upstream push-project list-projects switch-project validate-terraform validate-ansible
+.PHONY: help init-project sync-upstream push-project list-projects switch-project validate-terraform validate-ansible setup-env
 
 PROJECT ?= default
 SCRIPT := ./scripts/git-iac-workflow.sh
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+
+setup-env: ## Setup starship and tmux configs
+	@mkdir -p ~/.config
+	@ln -sf $(PWD)/.config/starship.toml ~/.config/starship.toml
+	@ln -sf $(PWD)/.tmux.conf ~/.tmux.conf
+	@mkdir -p ~/.bashrc.d
+	@ln -sf $(PWD)/.bashrc.d/iac-workflow.sh ~/.bashrc.d/iac-workflow.sh
+	@echo "Add to ~/.bashrc: [ -f ~/.bashrc.d/iac-workflow.sh ] && source ~/.bashrc.d/iac-workflow.sh"
 
 init-project: ## Initialize new project branch (make init-project PROJECT=myapp)
 	@bash $(SCRIPT) init $(PROJECT)
